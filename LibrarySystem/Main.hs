@@ -1,5 +1,7 @@
+import IOUtils qualified
 import Views qualified
 
+main :: IO ()
 main = do
   home
 
@@ -8,12 +10,11 @@ home = do
   welcome
   homeLoop
 
+homeLoop :: IO ()
 homeLoop = do
   Views.homeView
-  inp <- getLine
-  if inp == "exit"
-    then putStrLn "Bye!!!"
-    else homeLoop
+  IOUtils.clearScreen
+  homeLoop
 
 welcome :: IO ()
 welcome = do
