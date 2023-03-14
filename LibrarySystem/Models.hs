@@ -1,10 +1,18 @@
 {-# LANGUAGE DefaultSignatures #-}
 
-module Models (Book (..), Member (..), toMap, putDetails) where
+module Models (Book (..), Member (..), Loan (..), toMap, putDetails) where
 
 import Control.Monad (foldM, foldM_)
 import Data.Map qualified as Map
 import Data.Maybe qualified as Mb
+
+data Loan = Loan
+  { book :: Book,
+    member :: Member,
+    loan_date :: String,
+    returned :: Bool
+  }
+  deriving (Show)
 
 data Book = Book
   { author :: String,
