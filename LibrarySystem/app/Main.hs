@@ -1,5 +1,5 @@
-import IOUtils qualified
-import Views qualified
+import qualified IOUtils
+import qualified Views
 
 main :: IO ()
 main = do

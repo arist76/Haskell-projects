@@ -1,21 +1,8 @@
-module DB
-  ( getBook,
-    deleteBook,
-    editBook,
-    getMember,
-    deleteMember,
-    editMember,
-    getAllBooks,
-    registerBook,
-    registerMember,
-    createLoan,
-    getLoan,
-    editLoan,
-  )
-where
+module DB (getBook, deleteBook, editBook, getMember, deleteMember, editMember, getAllBooks, registerBook, registerMember, createLoan, getLoan, editLoan) where
 
-import Models (Loan (loan_date))
-import Models qualified
+import Database.SQLite.Simple
+import Database.SQLite.Simple.FromRow
+import qualified Models
 
 getBook :: String -> IO Models.Book
 getBook title = do
@@ -65,3 +52,9 @@ editLoan from to = do
 getLoan :: (String, String) -> IO Models.Loan
 getLoan loan = do
   return undefined
+
+withConn :: String -> (Connection -> IO ()) -> IO ()
+withConn dbName action = do
+  conn <- open dbName
+  action conn
+  close conn

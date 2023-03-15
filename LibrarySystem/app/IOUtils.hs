@@ -1,10 +1,4 @@
-module IOUtils
-  ( clearScreen,
-    putOptions,
-    putUnderlined,
-    promptGetLine,
-  )
-where
+module IOUtils (clearScreen, putOptions, putUnderlined, promptGetLine) where
 
 import Control.Monad (foldM_)
 

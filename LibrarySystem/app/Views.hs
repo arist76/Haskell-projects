@@ -1,20 +1,12 @@
-module Views
-  ( homeView,
-    bookView,
-    memberView,
-  )
-where
+module Views (homeView, bookView, memberView) where
 
 import Control.Monad (foldM, foldM_)
-import DB qualified
-import Data.ByteString qualified as Models
-import Data.Map qualified as Map
-import Data.Maybe qualified as Mb
+import qualified DB
+import qualified Data.Map as Map
+import qualified Data.Maybe as Mb
 import Data.Time.Clock (getCurrentTime)
-import Distribution.Simple.Program qualified as IOUtils
-import IOUtils qualified
-import Models (Book (inStore))
-import Models qualified
+import qualified IOUtils
+import qualified Models
 import System.Exit (exitSuccess)
 
 homeView :: IO ()

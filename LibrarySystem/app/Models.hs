@@ -3,8 +3,8 @@
 module Models (Book (..), Member (..), Loan (..), toMap, putDetails) where
 
 import Control.Monad (foldM, foldM_)
-import Data.Map qualified as Map
-import Data.Maybe qualified as Mb
+import qualified Data.Map as Map
+import qualified Data.Maybe as Mb
 
 data Loan = Loan
   { book :: Book,
@@ -24,7 +24,7 @@ data Book = Book
   deriving (Show, Eq, Ord)
 
 instance DetailedEntity Book where
-  toMap :: Book -> Map.Map String [String]
+  -- toMap :: Book -> Map.Map String [String]
   toMap b =
     Map.fromList
       [ ("1#author", [author b]),
@@ -44,7 +44,7 @@ data Member = Member
   deriving (Show, Eq, Ord)
 
 instance DetailedEntity Member where
-  toMap :: Member -> Map.Map String [String]
+  -- toMap :: Member -> Map.Map String [String]
   toMap m =
     Map.fromList
       [ ("1#first name", [firstName m]),
