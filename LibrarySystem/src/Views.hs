@@ -1,9 +1,12 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Views (homeView, bookView, memberView) where
 
 import Control.Monad (foldM, foldM_)
 import qualified DB
 import qualified Data.Map as Map
 import qualified Data.Maybe as Mb
+import qualified Data.Text as T
 import Data.Time.Clock (getCurrentTime)
 import qualified IOUtils
 import qualified Models
@@ -28,6 +31,8 @@ homeView = do
     "3" -> bookView
     "4" -> registerMemberView
     "5" -> memberView
+    "6" -> loanBookView
+    "7" -> returnBookView
     "exit" -> do
       putStrLn "Bye!!!"
       exitSuccess
@@ -77,20 +82,32 @@ bookView = do
 
       DB.editBook
         Models.Book
-          { Models.author = atr,
-            Models.title = ttl,
-            Models.price = if null prc then -1 else read prc :: Double,
-            Models.inStore = if null istr then -1 else read istr :: Int,
-            Models.loanedOut = []
+          { Models.bookID = Models.bookID bookModel,
+            Models.author =
+              if null atr
+                then Models.author bookModel
+                else atr,
+            Models.title =
+              if null ttl
+                then Models.title bookModel
+                else ttl,
+            Models.price =
+              if null prc
+                then Models.price bookModel
+                else read prc :: Double,
+            Models.inStore =
+              if null istr
+                then Models.inStore bookModel
+                else read istr :: Int
           }
 
 memberView :: IO ()
 memberView = do
   IOUtils.clearScreen
-  member <- IOUtils.promptGetLine "what is the name of the member"
+  member <- IOUtils.promptGetLine "what is the id of the member"
   IOUtils.clearScreen
   IOUtils.putUnderlined "Member Details"
-  memberModel <- DB.getMember member
+  memberModel <- DB.getMember (read member :: Integer)
   Models.putDetails memberModel
   putStrLn $ replicate 50 '_'
   IOUtils.putOptions
@@ -104,29 +121,29 @@ memberView = do
     "2" -> do
       DB.deleteMember memberModel
     "3" -> do
-      mid <-
-        IOUtils.promptGetLine $
-          "what is the new member id number? (press 'Enter' to continue with: "
-            ++ show (Models.member_id memberModel)
-            ++ ")"
       fnm <-
         IOUtils.promptGetLine $
           "what is the new first name? (press 'Enter' to continue with: "
-            ++ show (Models.member_id memberModel)
+            ++ show (Models.firstName memberModel)
             ++ ")"
       lnm <-
         IOUtils.promptGetLine $
           "what is the new last name? (press 'Enter' to continue with: "
-            ++ show (Models.member_id memberModel)
+            ++ show (Models.lastName memberModel)
             ++ ")"
 
       DB.editMember
         Models.Member
-          { Models.member_id = if null mid then -1 else read mid :: Integer,
-            Models.firstName = fnm,
-            Models.lastName = lnm,
-            Models.registeredDate = "",
-            Models.booksBorrowed = []
+          { Models.member_id = Models.member_id memberModel,
+            Models.firstName =
+              if null fnm
+                then Models.firstName memberModel
+                else fnm,
+            Models.lastName =
+              if null lnm
+                then Models.lastName memberModel
+                else lnm,
+            Models.registeredDate = undefined
           }
       getLine
       return ()
@@ -158,14 +175,15 @@ registerBookView = do
 
   DB.registerBook
     Models.Book
-      { Models.author =
+      { Models.bookID = undefined,
+        Models.author =
           if null atr
             then error "Book.author cannot be null"
             else atr,
         Models.title =
           if null ttl
             then error "Book.title cannot be null"
-            else atr,
+            else ttl,
         Models.price =
           if null prc
             then error "Book.price cannot be null"
@@ -173,8 +191,7 @@ registerBookView = do
         Models.inStore =
           if null istr
             then error "Book.inStore cannot be null"
-            else read istr :: Int,
-        Models.loanedOut = []
+            else read istr :: Int
       }
 
 registerMemberView :: IO ()
@@ -199,8 +216,7 @@ registerMemberView = do
           if null lnm
             then error "Book.lastName cannot be null"
             else lnm,
-        Models.registeredDate = show rdt,
-        Models.booksBorrowed = []
+        Models.registeredDate = show rdt
       }
 
 loanBookView :: IO ()
@@ -208,15 +224,15 @@ loanBookView = do
   IOUtils.clearScreen
   mid <- IOUtils.promptGetLine "What is the ID of the member borrowing the book"
   ttl <- IOUtils.promptGetLine "What is the title of the book being loaned out"
+  ldt <- getCurrentTime
 
   bk <- DB.getBook ttl
-  mbr <- DB.getMember mid
-  ldt <- getCurrentTime
 
   DB.createLoan
     Models.Loan
-      { Models.book = bk,
-        Models.member = mbr,
+      { Models.loanID = undefined,
+        Models.book = Models.bookID bk,
+        Models.member = read mid :: Integer,
         Models.loan_date = show ldt,
         Models.returned = False
       }
@@ -225,13 +241,15 @@ returnBookView :: IO ()
 returnBookView = do
   IOUtils.clearScreen
   mid <- IOUtils.promptGetLine "What is the ID of the member returning the book"
-  ttl <- IOUtils.promptGetLine "what is te title of the book being returned"
+  ttl <- IOUtils.promptGetLine "what is the title of the book being returned"
 
-  ln <- DB.getLoan (mid, ttl)
+  bk <- DB.getBook ttl
+
+  ln <- DB.getLoan (read mid :: Integer, Models.bookID bk)
   DB.editLoan
-    (mid, ttl)
     Models.Loan
-      { Models.book = Models.book ln,
+      { Models.loanID = Models.loanID ln,
+        Models.book = Models.book ln,
         Models.member = Models.member ln,
         Models.loan_date = Models.loan_date ln,
         Models.returned = True
