@@ -97,7 +97,7 @@ getLoanByBook book = do
   return resp
 
 instance DetailedEntity Book where
-  -- toMap :: Book -> Map.Map String [String]
+  toMap :: Book -> Map.Map String [String]
   toMap b =
     Map.fromList
       [ ("1#author", [author b]),
@@ -108,7 +108,7 @@ instance DetailedEntity Book where
       ]
 
 instance DetailedEntity Member where
-  -- toMap :: Member -> Map.Map String [String]
+  toMap :: Member -> Map.Map String [String]
   toMap m =
     Map.fromList
       [ ("1#first name", [firstName m]),

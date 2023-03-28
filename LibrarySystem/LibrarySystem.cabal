@@ -28,7 +28,8 @@ executable LibrarySystem
     other-modules:    IOUtils,
                       DB,
                       Models,
-                      Views
+                      Views,
+                      DBTest
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -37,6 +38,8 @@ executable LibrarySystem
         containers,
         time,
         text,
-        sqlite-simple
-    hs-source-dirs:   app, src
+        sqlite-simple,
+        HUnit,
+        process
+    hs-source-dirs:   app, src, tests
     default-language: Haskell2010

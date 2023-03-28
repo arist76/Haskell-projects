@@ -1,0 +1,3 @@
+DELETE FROM Book;
+DELETE FROM Member;
+DELETE FROM Loan;

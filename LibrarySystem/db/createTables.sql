@@ -22,12 +22,7 @@ CREATE TABLE Loan (
     book INTEGER,
     member INTEGER,
     loanDate VARCHAR (25),
+    returned BOOLEAN,
     FOREIGN KEY (book) REFERENCES Book(id),
     FOREIGN KEY (member) REFERENCES Member(member_id)
 );
-
--- INSERT INTO Book (author, title, price, inStore) VALUES ("sura", "tom and jerry", 2.99, TRUE);
-
--- INSERT INTO Book (author, price, inStore) VALUES ("abebe", "harry potter", 12.54, FALSE);
-
--- INSERT INTO Book (author, price, inStore) VALUES ("jemal", "mission impossible", 32.2, FALSE);
